@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: flask
+  template:
+    metadata:
+      labels:
+        app: flask
+    spec:
+      containers:
+        - name: flask
+          image: dhrypt/flask-mongodb-app
+          ports:
+            - containerPort: 5000
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-root-username
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongodb-secret
+                  key: mongo-root-password
+            - name: MONGODB_URI
+              value: "mongodb://mongodb:27017"
+          resources:
+            requests:
+              memory: "250Mi"
+              cpu: "200m"
+            limits:
+              memory: "500Mi"
+              cpu: "500m"
